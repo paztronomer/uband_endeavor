@@ -1,6 +1,8 @@
 # Skytemplates for u-band
 
 ## 1) For selection of exposures
+I selected public data from NOAO, which combined with DES data is the dataset I'm working with. Data range is 20170102 to 20190116.
+
 I used number of objects vs exposure time as an indicator. Using the script `plot_nobjects.py`, 536 exposures were selected, as plotted on `nobj_exptime_r4083.png`. There is a SQL script to query for number of objects per exposure (`query_nobjects_exptime_r4083.sql`). As this selection had many exposures with issues, I made sub-selections, as listed on different files under `skypca/`:
 
 | filename | N exposures | source of exposures | comments |
@@ -29,11 +31,45 @@ Fora all the above datasets I tried Y2 and Y5 stacks (Y2Nstack 1.0.6+12, Y2Nstac
 
 The RMS showing the *less bad* solution was 0.03, but still produced the binned 128x128 pix blocks on the full-size sky template solution.
 
-The results (FITS files) for the sets "sel2" and "sel4" (see above table) are stored under `skypca/pca_{sel2, sel4}/`. The naming is **pca_{used stack}_{selection}_u_{RMS value}_n{number of PCA components}.fits**
+The results (FITS files) for the sets "sel2" and "sel4" (see above table) are stored under `skypca/pca_{sel2, sel4}/`. The naming is **pca_{used stack}\_{selection}\_u\_{RMS value}\_n{number of PCA components}.fits**
 
 Note that a healthy PCA solution should look like `OPS/cal/skytemp/20140801t1130-r1635/p02/binned-fp/Y2A1_20140801t1130_u_r1635p02_skypca-binned-fp.fits` Where each of the 4 components has its own defined soft gradient behavior.
 
+## 3) Fix to run sky_template
+As `sky_template` code performs a check to make sure all the exposures to be used have the same set of calibrations, then a hack needs to be done to overcome it. The reason is our time range spans more than one epoch.
 
+On a local copy of `sky_template.py` change the following lines inside the call of class SkyTemplate(PixCorrectDriver):
+```
+try:
+    items_must_match(hdr, usehdr, 'BAND','CCDNUM','FLATFIL')
+except:
+    return 1
+```
+for the following
+```
+try:
+    items_must_match(hdr, usehdr, 'BAND','CCDNUM','FLATFIL')
+except:
+    t_e = 'Mismatch: '
+    if (hdr['BAND'] != usehdr['BAND']):
+        t_e += 'Band. ref:{0}'.format(hdr['BAND'])
+        t_e += ' vs '
+        t_e += 'current:{0}'.format(usehdr['BAND'])
+    elif (hdr['CCDNUM'] != usehdr['CCDNUM']):
+        t_e += 'CCD. ref:{0}'.format(hdr['CCDNUM'])
+        t_e += ' vs current:'
+        t_e += '{0}'.format(usehdr['CCDNUM'])
+    elif (hdr['FLATFIL'] != usehdr['FLATFIL']):
+        t_e += 'Flat.'
+        t_e += ' ref:{0}'.format(hdr['FLATFIL'])
+        t_e += ' vs current:'
+        t_e += '{0}'.format(usehdr['FLATFIL'])
+    else:
+        t_e = 'Unknown mismatch error.'
+    logger.error(t_e)
+```
+
+This should take care of the issue.
 
 ### Directories
 * `ingredients_processing/`: scripts and files for processing ingredients to be used
