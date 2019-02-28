@@ -3,6 +3,8 @@
 ## 1) For selection of exposures
 I selected public data from NOAO, which combined with DES data is the dataset I'm working with. Data range is 20170102 to 20190116.
 
+All the exposures where processed under **reqnum=4083**
+
 I used number of objects vs exposure time as an indicator. Using the script `plot_nobjects.py`, 536 exposures were selected, as plotted on `nobj_exptime_r4083.png`. There is a SQL script to query for number of objects per exposure (`query_nobjects_exptime_r4083.sql`). As this selection had many exposures with issues, I made sub-selections, as listed on different files under `skypca/`:
 
 | filename | N exposures | source of exposures | comments |
