@@ -1,0 +1,10 @@
+source /cvmfs/des.opensciencegrid.org/eeups/startupcachejob21i.sh
+
+export DES_DB_SECTION=db-desoper
+
+setup -v Y2Nstack 1.0.6+14
+# setup -v Y2Nstack 1.0.6+12
+setup -v easyaccess 
+setup -v pandas
+
+export HISTTIMEFORMAT="%d/%m/%y %T "
