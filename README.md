@@ -73,6 +73,11 @@ except:
 
 This should take care of the issue.
 
+## SOLUTION
+When setup the environment, just call the stack, **and no additional packages**. If I get rid of the setup of `pandas` and `easyaccess` it solves the issue. Results of healthy PCA solutions are under `skypca/pca_sel2/pca_Y2N+14_onlyStack_sel2*`
+
+The difference between `numpy 1.9.1+2` and `numpy 1.9.1+7` in its compilation or inner functions causes the problem.
+
 ### Directories
 * `ingredients_processing/`: scripts and files for processing ingredients to be used
 * `skypca`: files for creating PCA solutions, results having issues, and binned images to be used as ingredients.
