@@ -30,10 +30,23 @@ def pc_comp2(fnm1, fnm2):
     x0 = np.copy(fits.open(fnm1)[0].data)
     y0 = np.copy(fits.open(fnm2)[0].data)
 
-    fig, ax = plt.subplots()
-    row = np.arange(x0.shape[0])
-    ax.plot(row, x0[:, 0], '-')
-    ax.plot(row, y0[:, 0], '-')
+    fig, axis = plt.subplots(4, 1, figsize=(8, 4), sharex=True)
+    for i, ax in enumerate(axis):
+        kw = {
+            'ls': '-',
+            'lw': 0.3,
+        }
+        ax.plot(x0[:, i], color='navy', **kw)
+        ax.plot(y0[:, i], color='gold', **kw)
+        ax.text(0.1, 0.7, 'PC{0}'.format(i + 1), transform=ax.transAxes)
+        ax.set_ylabel('PC value')
+    axis[-1].set_xlabel('row')
+
+    plt.suptitle('[u-band] Per-component comparison between healthy/bad PCA',
+                 color='g')
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.98, top=0.9, hspace=0.1)
+   
+    plt.savefig('pc_comparison.png', dpi=300, format='png')
 
     plt.show()
     exit()
